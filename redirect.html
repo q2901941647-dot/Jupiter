@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bloom AI — Opening…</title>
+  <style>
+    :root {
+      --bg: #04080a;
+      --accent: #4fe3a8;
+      --text: #eef5f1;
+      --muted: #9fb6ab;
+      --line: rgba(255, 255, 255, 0.12);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background:
+        radial-gradient(120% 90% at 75% 25%, rgba(43, 191, 134, 0.16), transparent 46%),
+        radial-gradient(140% 120% at 50% 120%, #0a2018, #06120e 40%, #04080a);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .card { width: min(560px, 100%); text-align: center; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .dots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
+    .dots i {
+      width: 11px; height: 11px; border-radius: 50%;
+      background: linear-gradient(135deg, #9bf6cf, #2bbf86);
+      box-shadow: 0 0 10px rgba(79, 227, 168, 0.5);
+    }
+    .brand b { font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
+    .eyebrow {
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 14px;
+    }
+    h1 { font-size: clamp(30px, 6vw, 46px); font-weight: 300; line-height: 1.12; letter-spacing: -0.02em; }
+    h1 em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 600; }
+    .sub { margin: 16px auto 0; max-width: 420px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .bar {
+      height: 3px; width: min(280px, 70%); margin: 28px auto 22px;
+      background: rgba(255, 255, 255, 0.08); border-radius: 999px; overflow: hidden;
+    }
+    .bar span {
+      display: block; height: 100%; width: 0; border-radius: 999px;
+      background: linear-gradient(90deg, #2bbf86, #9bf6cf);
+      animation: load 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    }
+    @keyframes load { to { width: 100%; } }
+    .btn {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 12px 24px; border-radius: 999px;
+      background: linear-gradient(135deg, #5cf0b4, #2bbf86);
+      color: #04140d; font-weight: 600; font-size: 14px; text-decoration: none;
+      box-shadow: 0 12px 34px rgba(43, 191, 134, 0.24);
+      transition: transform 0.2s;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .meta { margin-top: 18px; font-size: 11.5px; color: #6f877d; }
+    .meta code {
+      color: #b7d8c9; background: rgba(255, 255, 255, 0.04);
+      padding: 2px 6px; border-radius: 6px; word-break: break-all;
+    }
+    .hint { margin-top: 14px; font-size: 12px; color: #ffb1a1; display: none; }
+    .hint.show { display: block; }
+    @media (prefers-reduced-motion: reduce) {
+      .bar span { animation: none; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="brand">
+      <span class="dots"><i></i><i></i><i></i><i></i></span>
+      <b>bloom</b>
+    </div>
+    <p class="eyebrow">Visionary Design</p>
+    <h1>Opening <em>Bloom AI</em>…</h1>
+    <p class="sub">Forwarding you to the live site. If nothing happens in a moment, use the button below.</p>
+    <div class="bar"><span></span></div>
+    <a class="btn" id="go" href="#">Open the site <span aria-hidden="true">→</span></a>
+    <p class="meta">Target: <code id="target">…</code></p>
+    <p class="hint" id="hint">No live target detected. Set <code>CUSTOM_TARGET</code> in this file to your deployed URL.</p>
+  </main>
+
+  <script>
+    // ── Configuration ────────────────────────────────────────────────
+    // Paste a full URL here to override the auto-detected target, e.g.
+    //   "https://jupiterstar-ai.github.io/Jupiter/"
+    // Leave empty to auto-detect:
+    //   - on *.github.io → https://<user>.github.io/<repo>/
+    //   - elsewhere      → ./bloom-ai-jupiter/
+    const CUSTOM_TARGET = "";
+    // ─────────────────────────────────────────────────────────────────
+    const repo = location.pathname.split("/").filter(Boolean)[0] || "";
+    const onPages = location.hostname.endsWith("github.io") && repo;
+    const autoTarget = onPages ? `${location.origin}/${repo}/` : "./bloom-ai-jupiter/";
+    const target = CUSTOM_TARGET || autoTarget;
+    const isFile = location.protocol === "file:";
+    const shouldRedirect = Boolean(CUSTOM_TARGET) || onPages;
+
+    const label = document.getElementById("target");
+    const go = document.getElementById("go");
+    const hint = document.getElementById("hint");
+
+    label.textContent = target;
+    go.href = target;
+
+    if (!target || target === location.href || !shouldRedirect) {
+      if (isFile) {
+        hint.textContent = "Opened from disk. Run `npm run dev` and open http://localhost:5173/.";
+      } else {
+        hint.textContent = "Preview mode — set CUSTOM_TARGET to your live URL, or deploy with GitHub Pages.";
+      }
+      hint.classList.add("show");
+    } else {
+      window.setTimeout(() => {
+        window.location.replace(target);
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
